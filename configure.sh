@@ -134,6 +134,10 @@ set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-resurrect'  # Save and restore tmux sessions
 set -g @plugin 'tmux-plugins/tmux-continuum'  # Continuous saving of tmux environment
 
+# Settings
+set -g @continuum-restore 'on'
+set -g mouse on
+
 # Initialize TPM (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
 EOF
