@@ -136,6 +136,8 @@ set -g @plugin 'tmux-plugins/tmux-continuum'  # Continuous saving of tmux enviro
 
 # Settings
 set -g @continuum-restore 'on'
+set -g @continuum-boot 'on'
+set -g @continuum-save-interval '5'
 set -g mouse on
 
 # Initialize TPM (keep this line at the very bottom of tmux.conf)
