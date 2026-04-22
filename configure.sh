@@ -124,8 +124,32 @@ install_tmux_conf() {
     
     # Create the tmux configuration
     cat > "$target_file" << 'EOF'
+# -- Basic Settings ------------------------------------------
+set -g @continuum-restore 'on'
+set -g @continuum-boot 'on'
+set -g @continuum-save-interval '5'
+set -g mouse on
+set -g prefix C-b
+set -g escape-time 500
+set -g history-limit 50000
+set -g base-index 1
+setw -g pane-base-index 1
+
+setw -g mode-keys vi
+
+set-option -g renumber-windows on
+
+bind-key f display-popup -E "find . -type f | fzf | xargs nvim"
+bind-key H display-popup -E "htop"
+bind-key N display-popup -E "nvim /Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/Documents/Marcels Second Brain/Notes/quick-note.md"
+bind-key C display-popup -w 80% -h 60% -E "bash"
+bind-key g display-popup -w 80% -h 80% -E "git status && echo 'Press any key to close' && read"
+
 # Tmux Plugin Manager (TPM) - Essential plugin manager for tmux
 set -g @plugin 'tmux-plugins/tpm'
+
+# Theme
+set -g @plugin 'arcticicestudio/nord-tmux'
 
 # Tmux sensible defaults - Basic tmux settings that everyone can agree on
 set -g @plugin 'tmux-plugins/tmux-sensible'
@@ -134,11 +158,48 @@ set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-resurrect'  # Save and restore tmux sessions
 set -g @plugin 'tmux-plugins/tmux-continuum'  # Continuous saving of tmux environment
 
-# Settings
-set -g @continuum-restore 'on'
-set -g @continuum-boot 'on'
-set -g @continuum-save-interval '5'
-set -g mouse on
+# Other plugins
+set -g @plugin 'tmux-plugins/tmux-yank'
+set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin 'tmux-plugins/tmux-cpu'
+set -g @plugin 'tmux-plugins/tmux-pain-control'
+set -g @plugin 'tmux-plugins/tmux-copycat'
+set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
+set -g @plugin 'tmux-plugins/tmux-battery'
+set -g @plugin 'tmux-plugins/tmux-sidebar'
+
+# -- Status Bar ---------------------------------------------
+set -g @nord_tmux_show_status_content "0"
+set -g status-position bottom
+set -g status-interval 1
+set -g status-left "#{session_name} "
+set -g status-left-length 50
+set -g status-right-length 200
+
+# -- Custom Nord Tmux Extended Status Bar -------------------
+# Copyright (c) 2016-present Sven Greb <development@svengreb.de>
+# This source code is licensed under the MIT license found in the license file.
+
+#+----------------+
+#+ Plugin Support +
+#+----------------+
+#+--- tmux-prefix-highlight ---+
+set -g @prefix_highlight_output_prefix "#[fg=brightcyan]#[bg=black]#[nobold]#[noitalics]#[nounderscore]#[bg=brightcyan]#[fg=black]"
+set -g @prefix_highlight_output_suffix ""
+set -g @prefix_highlight_copy_mode_attr "fg=brightcyan,bg=black,bold"
+
+#+--------+
+#+ Status +
+#+--------+
+#+--- Bars ---+
+set -g status-left "#[fg=black,bg=blue,bold] #S #[fg=blue,bg=black,nobold,noitalics,nounderscore]"
+set -g status-right "#{prefix_highlight}#[fg=brightblack,bg=black,nobold,noitalics,nounderscore]#[fg=white,bg=brightblack] %Y-%m-%d #[fg=white,bg=brightblack,nobold,noitalics,nounderscore]#[fg=white,bg=brightblack] %H:%M #[fg=cyan,bg=brightblack,nobold,noitalics,nounderscore]#[fg=black,bg=cyan,bold] #H "
+
+#+--- Windows ---+
+set -g window-status-format "#[fg=black,bg=brightblack,nobold,noitalics,nounderscore] #[fg=white,bg=brightblack]#I #[fg=white,bg=brightblack,nobold,noitalics,nounderscore] #[fg=white,bg=brightblack]#W #F #[fg=brightblack,bg=black,nobold,noitalics,nounderscore]"
+set -g window-status-current-format "#[fg=black,bg=cyan,nobold,noitalics,nounderscore] #[fg=black,bg=cyan]#I #[fg=black,bg=cyan,nobold,noitalics,nounderscore] #[fg=black,bg=cyan]#W #F #[fg=cyan,bg=black,nobold,noitalics,nounderscore]"
+set -g window-status-separator ""
+
 
 # Initialize TPM (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
