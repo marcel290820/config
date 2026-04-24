@@ -1,0 +1,61 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "everything-claude-code@everything-claude-code": true,
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "context7@claude-plugins-official": false,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "github@claude-plugins-official": false,
+    "security-guidance@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": true,
+    "playwright@claude-plugins-official": false,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "firecrawl@claude-plugins-official": true,
+    "semgrep@claude-plugins-official": true,
+    "greptile@claude-plugins-official": false,
+    "notion@claude-plugins-official": true,
+    "caveman@caveman": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-mem@thedotmack": true
+  },
+  "extraKnownMarketplaces": {
+    "everything-claude-code": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/affaan-m/everything-claude-code.git"
+      }
+    },
+    "karpathy-skills": {
+      "source": {
+        "source": "github",
+        "repo": "forrestchang/andrej-karpathy-skills"
+      }
+    },
+    "thedotmack": {
+      "source": {
+        "source": "github",
+        "repo": "thedotmack/claude-mem"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "effortLevel": "xhigh"
+}
