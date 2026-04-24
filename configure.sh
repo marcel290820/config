@@ -139,11 +139,16 @@ setw -g mode-keys vi
 
 set-option -g renumber-windows on
 
-bind-key f display-popup -E "find . -type f | fzf | xargs nvim"
+bind-key f display-popup -d '#{pane_current_path}' -E "find . -type f | fzf | xargs nvim"
 bind-key H display-popup -E "htop"
-bind-key N display-popup -E "nvim /Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/Documents/Marcels Second Brain/Notes/quick-note.md"
-bind-key C display-popup -w 80% -h 60% -E "bash"
-bind-key g display-popup -w 80% -h 80% -E "git status && echo 'Press any key to close' && read"
+bind-key N display-popup -E "nvim '/Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/Documents/Marcels Second Brain/Notes/quick-note.md'"
+bind-key C display-popup -w 80% -h 60% -E "zsh"
+bind-key g display-popup -d '#{pane_current_path}' -w80% -h80% -E lazygit
+bind-key y run-shell '\
+  SESSION="claude-$(echo #{pane_current_path} | md5sum | cut -c1-8)"; \
+  tmux has-session -t "$SESSION" 2>/dev/null || \
+  tmux new-session -d -s "$SESSION" -c "#{pane_current_path}" "claude"; \
+  tmux display-popup -w80% -h80% -E "tmux attach-session -t $SESSION"'
 
 # Tmux Plugin Manager (TPM) - Essential plugin manager for tmux
 set -g @plugin 'tmux-plugins/tpm'
@@ -159,11 +164,7 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'  # Save and restore tmux sessions
 set -g @plugin 'tmux-plugins/tmux-continuum'  # Continuous saving of tmux environment
 
 # Other plugins
-set -g @plugin 'tmux-plugins/tmux-yank'
-set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'tmux-plugins/tmux-cpu'
-set -g @plugin 'tmux-plugins/tmux-pain-control'
-set -g @plugin 'tmux-plugins/tmux-copycat'
 set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-sidebar'
@@ -193,7 +194,7 @@ set -g @prefix_highlight_copy_mode_attr "fg=brightcyan,bg=black,bold"
 #+--------+
 #+--- Bars ---+
 set -g status-left "#[fg=black,bg=blue,bold] #S #[fg=blue,bg=black,nobold,noitalics,nounderscore]"
-set -g status-right "#{prefix_highlight}#[fg=brightblack,bg=black,nobold,noitalics,nounderscore]#[fg=white,bg=brightblack] %Y-%m-%d #[fg=white,bg=brightblack,nobold,noitalics,nounderscore]#[fg=white,bg=brightblack] %H:%M #[fg=cyan,bg=brightblack,nobold,noitalics,nounderscore]#[fg=black,bg=cyan,bold] #H "
+set -g status-right "#{prefix_highlight}#[fg=magenta,bg=black,nobold,noitalics,nounderscore]#[fg=black,bg=magenta] 🧠 #{cpu_percentage} #[fg=black,bg=magenta,nobold,noitalics,nounderscore]#[fg=black,bg=magenta] 💾 #{ram_percentage} #[fg=black,bg=magenta,nobold,noitalics,nounderscore]#[fg=black,bg=magenta] #{?#{m/r:^(([0-9]|1[0-9]|20)%$),#{battery_percentage}},🪫,🔋} #{battery_percentage} #[fg=brightblack,bg=magenta,nobold,noitalics,nounderscore]#[fg=white,bg=brightblack] %Y-%m-%d #[fg=white,bg=brightblack,nobold,noitalics,nounderscore]#[fg=white,bg=brightblack] %H:%M #[fg=cyan,bg=brightblack,nobold,noitalics,nounderscore]#[fg=black,bg=cyan,bold] #H "
 
 #+--- Windows ---+
 set -g window-status-format "#[fg=black,bg=brightblack,nobold,noitalics,nounderscore] #[fg=white,bg=brightblack]#I #[fg=white,bg=brightblack,nobold,noitalics,nounderscore] #[fg=white,bg=brightblack]#W #F #[fg=brightblack,bg=black,nobold,noitalics,nounderscore]"
