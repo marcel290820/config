@@ -1,0 +1,5 @@
+i want to make my config repo more robust. that means no inline config, simplified installs and usage of direct files in the @dotfiles/ dir for config/dotfiles. Write a migration plan for this new vision of an improved config repo which i can use to quickly set up a new macOS with my fav tools and config. remove also all stuff for linux because from now on i will only us macOS
+
+---
+
+yes and please remove ngrok from the setup. its not really a necessary tool to me
