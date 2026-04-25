@@ -1,158 +1,73 @@
-# System Configuration & Installation
+# macOS Config
 
-A comprehensive system setup toolkit for macOS development environments, featuring automated program installation and configuration management.
+One-command macOS setup — dotfiles, packages, and tool configuration.
 
-## Purpose
+## Quick Start
 
-This repository contains scripts and configurations for quickly setting up new macOS development machines or synchronizing configurations across multiple development environments. The goal is to maintain consistency and save time when configuring new systems.
-
-## Features
-
-- 🚀 Automated installation of essential development tools
-- 🔧 Automated configuration of dotfiles and settings
-- 💾 Automatic backup of existing configurations
-- 🎨 Colored terminal output for clear feedback
-- 🔒 Safe installation with backup protection
-- 🖥️ Optimized for macOS (with extensibility for other platforms)
-
-## Scripts Overview
-
-### `install-macos.sh` - macOS System Installation
-Installs essential development tools and programs specifically for macOS:
-- Xcode Command Line Tools
-- Homebrew package manager
-- Essential development tools (Ghostty terminal, tmux, git)
-
-### `configure.sh` - Configuration Management
-Manages dotfiles and system configurations (cross-platform):
-- Git configuration (`.gitconfig`)
-- Tmux configuration (`.tmux.conf`)
-- Automatic backup of existing configurations
-- Safe installation with rollback capability
-
-## Current Configurations
-
-- **Git Configuration** (`.gitconfig`) - Git user settings, aliases, and preferences
-- **Tmux Configuration** (`.tmux.conf`) - Tmux plugin configuration for session persistence
- - **ngrok zsh Completion** (appended block in `.zshrc`) - Automatically adds ngrok shell completion if ngrok is installed
-
-## Usage
-
-### Complete System Setup (Recommended for macOS)
-
-For a fresh macOS system, run both scripts in order:
-
-1. Clone this repository:
-   ```bash
-   git clone <repository-url>
-   cd config
-   ```
-
-2. Install macOS development tools:
-   ```bash
-   ./install-macos.sh
-   ```
-
-3. Configure dotfiles:
-   ```bash
-   ./configure.sh
-   ```
-
-### Individual Script Usage
-
-#### macOS Program Installation
-To install essential development tools on macOS without configuring dotfiles:
 ```bash
-./install-macos.sh
+git clone <repo-url> && cd config
+export NVIDIA_API_KEY=...
+export CONTEXT7_API_KEY=...
+./install.sh
 ```
 
-#### Configuration Only
-To configure dotfiles without installing programs (works on any Unix-like system):
-```bash
-./configure.sh
-```
+## What it does
 
-### What Each Script Does
+1. Installs Xcode Command Line Tools
+2. Installs/updates Homebrew
+3. Installs packages from `Brewfile` (ghostty, tmux, git, fzf, lazygit, htop, neovim)
+4. Symlinks dotfiles to `~/` (edits round-trip back to repo)
+5. Renders `opencode.json.tmpl` with API keys from env vars
+6. Copies `settings.json` and `statusline.sh` to `~/.claude/`
+7. Installs Tmux Plugin Manager (TPM)
 
-#### macOS Installation Script (`install-macos.sh`)
-1. **Checks system compatibility** - Ensures running on macOS
-2. **Installs Xcode Command Line Tools** - Essential development utilities for macOS
-3. **Installs Homebrew** - Package manager for macOS
-4. **Installs development tools** - Ghostty, tmux, git via Homebrew
-5. **Provides status updates** - Shows what's already installed vs. newly installed
+Idempotent — safe to re-run anytime.
 
-#### Configuration Script (`configure.sh`)
-1. **Detects your system** - Identifies your OS and home directory
-2. **Backup existing files** - Creates timestamped backups of any existing configuration files
-3. **Install configurations** - Copies configuration files to their appropriate locations
-   - Git configuration (`.gitconfig`) from source file
-   - Tmux configuration (`.tmux.conf`) with plugin settings
-4. **Set permissions** - Ensures proper file permissions are applied
-5. **Add ngrok completion** - Detects `ngrok` and appends a managed completion block to `.zshrc` (idempotent)
-6. **Provide feedback** - Shows colored output indicating success, warnings, or errors
+## Dotfiles
 
-### Backup System
+| File | Method | Target |
+|------|--------|--------|
+| `.gitconfig` | symlink | `~/.gitconfig` |
+| `.tmux.conf` | symlink | `~/.tmux.conf` |
+| `.zshrc` | symlink | `~/.zshrc` |
+| `opencode.json.tmpl` | template | `~/.config/opencode/opencode.json` |
+| `settings.json` | copy | `~/.claude/settings.json` |
+| `statusline.sh` | copy | `~/.claude/statusline.sh` |
 
-When existing configuration files are found, they are automatically backed up with a timestamp:
-- Format: `<filename>.backup.YYYYMMDD_HHMMSS`
-- Example: `.gitconfig.backup.20250523_143022`
+Existing files are backed up with timestamps before being replaced.
 
-This ensures you never lose your existing configurations and can easily restore them if needed.
+## Required Environment Variables
 
-### Output Colors
+| Variable | Used by |
+|----------|---------|
+| `NVIDIA_API_KEY` | opencode.json (NVIDIA provider) |
+| `CONTEXT7_API_KEY` | opencode.json (Context7 MCP) |
 
-The script uses colored output to make the configuration process clear:
-- 🔵 **Blue** - Informational messages
-- 🟢 **Green** - Success messages
-- 🟡 **Yellow** - Warning messages (like when backups are created)
-- 🔴 **Red** - Error messages
+If these are not set, the opencode config is skipped with a warning.
 
-## Adding New Components
+## Adding New Config
 
-### Adding New Programs to Install (macOS)
-To add new programs to the macOS installation script:
+1. Add the dotfile to `dotfiles/`
+2. Add a `symlink_dotfile` or `copy_dotfile` call in `install.sh`
+3. If it needs a Brew package, add it to `Brewfile`
 
-1. Edit `install-macos.sh`
-2. Add the package to the `packages` array in the `install_dev_tools()` function
-3. Follow the format: `"package-name:Display Name"`
+## Tmux Keybindings
 
-### Adding New Configurations
-To add new configuration files:
-
-1. Add the configuration file to this directory (if it's a file-based config)
-2. Update the `configure.sh` script to include installation logic for the new file
-3. Follow the same pattern as the existing `install_gitconfig()` or `install_tmux_conf()` functions
-
-### ngrok Completion Block
-
-If `ngrok` is installed when you run `./configure.sh`, the script appends a clearly delimited block to your `~/.zshrc`:
-
-```
-if command -v ngrok &>/dev/null; then
-   eval "$(ngrok completion)"
-fi
-```
-
-If a legacy marker-based block was previously inserted, the script will remove it and replace it with the exact 3-line snippet. Re-run `./configure.sh` any time after installing `ngrok` to add it. To remove completion, just delete those three lines manually.
+| Key | Action |
+|-----|--------|
+| `C-b f` | fzf + nvim file finder |
+| `C-b g` | lazygit |
+| `C-b y` | opencode popup |
+| `C-b N` | Obsidian quick note |
+| `C-b C` | zsh popup |
+| `C-b H` | htop |
 
 ## Requirements
 
-### For macOS Installation Script
-- **macOS (required)** - This script is designed specifically for macOS
+- macOS (Apple Silicon or Intel)
 - Internet connection
-- Administrator privileges (for Xcode Command Line Tools installation)
-
-### For Configuration Script
-- Bash shell
-- Standard Unix utilities (`cp`, `chmod`, `date`)
-- Write permissions to your home directory
-
-## Compatibility
-
-- ✅ **macOS** (primary target - full support for both installation and configuration)
-- 🔄 **Linux** (configuration script only - installation script would need adaptation for different package managers)
-- ❓ **Windows** (configuration script may work with WSL or Git Bash, installation script not applicable)
+- Admin privileges (for Xcode CLI Tools)
 
 ## License
 
-Personal use only - feel free to fork and adapt for your own configurations.
+Personal use only — fork and adapt freely.

@@ -1,0 +1,7 @@
+brew "ghostty"
+brew "tmux"
+brew "git"
+brew "fzf"
+brew "lazygit"
+brew "htop"
+brew "neovim"

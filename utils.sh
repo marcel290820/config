@@ -50,10 +50,5 @@ command_exists() {
 
 # Function to check if running on macOS
 is_macos() {
-    [[ "$(uname -s)" == "Darwin" ]]
-}
-
-# Function to check if running on Linux
-is_linux() {
-    [[ "$(uname -s)" == "Linux" ]]
+  [[ "$(uname -s)" == "Darwin" ]]
 }

@@ -1,28 +1,42 @@
 # AGENTS.md
 
 ## Repo purpose
-macOS dotfiles + setup scripts. `dotfiles/` is the canonical config source. Scripts (`configure.sh`, `install-macos.sh`) are secondary — may be simplified or removed.
+macOS dotfiles + one-command setup. `dotfiles/` is the canonical config source. `install.sh` is the only script.
 
 ## Source of truth
-- **`dotfiles/`** holds canonical dotfiles (`.tmux.conf`, `opencode.json`, `settings.json`, `statusline.sh`)
-- **`configure.sh`** inlines a stale tmux.conf that diverges from `dotfiles/.tmux.conf` (e.g. popup key binds `claude` vs `opencode`). Do **not** trust the inline copy; `dotfiles/.tmux.conf` is correct.
-- `.gitconfig` at repo root is the canonical git config (copied to `~/.gitconfig` by `configure.sh`).
+- **`dotfiles/`** holds all canonical dotfiles (`.gitconfig`, `.tmux.conf`, `.zshrc`, `settings.json`, `statusline.sh`)
+- **`dotfiles/opencode.json.tmpl`** is a template — API keys are env vars (`$NVIDIA_API_KEY`, `$CONTEXT7_API_KEY`), rendered at install time via `envsubst`
+- No inline config anywhere. All dotfiles are real files in `dotfiles/`.
 
-## Key divergence
-`configure.sh:126-207` — inline tmux heredoc is out of sync with `dotfiles/.tmux.conf`. If editing tmux config, edit `dotfiles/.tmux.conf` only. Do not edit the inline copy in `configure.sh` (it should eventually read from `dotfiles/` instead).
-
-## Running scripts
+## Running the setup
 ```bash
-./install-macos.sh   # macOS only: xcode CLI tools → homebrew → ghostty/tmux/git → TPM
-./configure.sh        # cross-platform: copies .gitconfig + .tmux.conf + ngrok completion to ~/
+./install.sh
 ```
-Order: `install-macos.sh` first, then `configure.sh`. Both source `utils.sh` for logging/helpers.
+Single script: Xcode CLI tools → Homebrew → Brewfile packages → symlink dotfiles → render templates → copy configs → TPM.
 
-## No build/test/lint
-Pure shell repo. No package manager, no CI, no test suite. Validate changes by running the relevant script.
+Idempotent — safe to re-run.
 
-## OpenCode config
-`dotfiles/opencode.json` — model + MCP config. Not at repo root. The `.opencode/` dir at root is an Entire CLI plugin (auto-generated, don't edit).
+## Required env vars (for opencode.json template)
+- `NVIDIA_API_KEY`
+- `CONTEXT7_API_KEY`
+
+Set these before running `install.sh` or the opencode config will be skipped with a warning.
+
+## Symlink architecture
+`install.sh` symlinks dotfiles to `~/`:
+- `dotfiles/.gitconfig` → `~/.gitconfig`
+- `dotfiles/.tmux.conf` → `~/.tmux.conf`
+- `dotfiles/.zshrc` → `~/.zshrc`
+
+Edits in `~/` round-trip back to the repo. Existing files are backed up before linking.
+
+Non-symlinkable configs (JSON, scripts) are copied:
+- `dotfiles/settings.json` → `~/.claude/settings.json`
+- `dotfiles/statusline.sh` → `~/.claude/statusline.sh`
+- `dotfiles/opencode.json.tmpl` → `~/.config/opencode/opencode.json` (rendered)
+
+## Brewfile
+`Brewfile` at repo root declares all Homebrew packages. Edit there, not in a script.
 
 ## Tmux popup keybindings (from dotfiles/.tmux.conf)
 | Key | Action |
@@ -35,8 +49,14 @@ Pure shell repo. No package manager, no CI, no test suite. Validate changes by r
 | `C-b H` | htop |
 
 ## Adding new dotfiles
-Place in `dotfiles/`. Update `configure.sh` to copy from there (not inline). Follow existing `install_gitconfig()` pattern: backup existing → copy → chmod.
+1. Place file in `dotfiles/`
+2. Add a `symlink_dotfile` or `copy_dotfile` call in `install.sh`
+3. If it's a Brew package, add to `Brewfile`
 
 ## Hardcoded paths
 - `dotfiles/.tmux.conf:19` — Obsidian note path hardcoded to `/Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/...`
 - `dotfiles/settings.json:8` — statusline script path `~/.claude/statusline.sh`
+- `dotfiles/.zshrc` — `wtree` alias path, `claude-mem` alias path
+
+## No build/test/lint
+Pure shell repo. No package manager, no CI, no test suite. Validate by running `./install.sh`.
