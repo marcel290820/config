@@ -22,4 +22,4 @@ fi
 # Git worktree helper alias
 alias wtree='~/Documents/Projects/Personal/git-toolkit/worktree-helper.sh'
 
-alias claude-mem='bun "/Users/mheidebrecht/.claude/plugins/cache/thedotmack/claude-mem/12.1.6/scripts/worker-service.cjs"'
+alias claude-mem='bun "~/.claude/plugins/cache/thedotmack/claude-mem/12.1.6/scripts/worker-service.cjs"'
