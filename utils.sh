@@ -34,7 +34,7 @@ backup_file() {
     local file_path="$1"
     local backup_path="${file_path}.backup.$(date +%Y%m%d_%H%M%S)"
     
-    if cp "$file_path" "$backup_path"; then
+    if mv "$file_path" "$backup_path"; then
         log_warning "Existing file backed up to: $backup_path"
         return 0
     else

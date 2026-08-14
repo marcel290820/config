@@ -59,14 +59,13 @@ symlink_dotfile() {
     fi
     log_warning "$(basename "$target") symlink points elsewhere — backing up and relinking"
     backup_file "$target"
-    rm "$target"
-  elif [[ -f "$target" || -d "$target" ]]; then
+  elif [[ -e "$target" ]]; then
     log_warning "Existing $(basename "$target") found — backing up"
     backup_file "$target"
-    rm -f "$target"
   fi
 
-  ln -sf "$source" "$target"
+  mkdir -p "$(dirname "$target")"
+  ln -sfn "$source" "$target"
   log_success "$(basename "$target") symlinked → $target"
 }
 
@@ -162,6 +161,11 @@ main() {
   symlink_dotfile "$DOTFILES_DIR/.tmux.conf"  "$HOME/.tmux.conf"
   symlink_dotfile "$DOTFILES_DIR/.zshrc"       "$HOME/.zshrc"
 
+  # Claude Code global instructions and skills
+  symlink_dotfile "$DOTFILES_DIR/CLAUDE.md"       "$HOME/.claude/CLAUDE.md"
+  symlink_dotfile "$DOTFILES_DIR/ARCHITECTURE.md" "$HOME/.claude/ARCHITECTURE.md"
+  symlink_dotfile "$DOTFILES_DIR/skills/ci-setup" "$HOME/.claude/skills/ci-setup"
+
   # Step 4: Template configs (require env vars)
   log_info "Rendering config templates..."
   install_template \
@@ -184,4 +188,7 @@ main() {
   log_info "In tmux, press prefix+I to install plugins"
 }
 
-main "$@"
+# Only run when executed directly, so the helpers can be sourced and tested
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

@@ -5,6 +5,8 @@ macOS dotfiles + one-command setup. `dotfiles/` is the canonical config source. 
 
 ## Source of truth
 - **`dotfiles/`** holds all canonical dotfiles (`.gitconfig`, `.tmux.conf`, `.zshrc`, `settings.json`, `statusline.sh`)
+- **`dotfiles/CLAUDE.md`** and **`dotfiles/ARCHITECTURE.md`** are the global Claude Code instructions. `CLAUDE.md` imports `ARCHITECTURE.md` and `RTK.md` by relative path, so both must sit beside it in `~/.claude/`. `RTK.md` is not in this repo yet.
+- **`dotfiles/skills/`** holds Claude Code skills, one directory per skill
 - **`dotfiles/opencode.json.tmpl`** is a template — API keys are env vars (`$NVIDIA_API_KEY`, `$CONTEXT7_API_KEY`), rendered at install time via `envsubst`
 - No inline config anywhere. All dotfiles are real files in `dotfiles/`.
 
@@ -27,8 +29,11 @@ Set these before running `install.sh` or the opencode config will be skipped wit
 - `dotfiles/.gitconfig` → `~/.gitconfig`
 - `dotfiles/.tmux.conf` → `~/.tmux.conf`
 - `dotfiles/.zshrc` → `~/.zshrc`
+- `dotfiles/CLAUDE.md` → `~/.claude/CLAUDE.md`
+- `dotfiles/ARCHITECTURE.md` → `~/.claude/ARCHITECTURE.md`
+- `dotfiles/skills/ci-setup` → `~/.claude/skills/ci-setup`
 
-Edits in `~/` round-trip back to the repo. Existing files are backed up before linking.
+Edits in `~/` round-trip back to the repo. Existing files are backed up before linking. `symlink_dotfile` handles files and directories, and creates the target's parent directory.
 
 Non-symlinkable configs (JSON, scripts) are copied:
 - `dotfiles/settings.json` → `~/.claude/settings.json`
@@ -43,7 +48,7 @@ Non-symlinkable configs (JSON, scripts) are copied:
 |-----|--------|
 | `C-b f` | fzf + nvim file finder |
 | `C-b g` | lazygit |
-| `C-b y` | opencode popup session |
+| `C-b y` | claude popup session |
 | `C-b N` | Obsidian quick note |
 | `C-b C` | zsh popup |
 | `C-b H` | htop |
@@ -54,7 +59,7 @@ Non-symlinkable configs (JSON, scripts) are copied:
 3. If it's a Brew package, add to `Brewfile`
 
 ## Hardcoded paths
-- `dotfiles/.tmux.conf:19` — Obsidian note path hardcoded to `/Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/...`
+- `dotfiles/.tmux.conf:38` — Obsidian note path hardcoded to `/Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/...`
 - `dotfiles/settings.json:8` — statusline script path `~/.claude/statusline.sh`
 - `dotfiles/.zshrc` — `wtree` alias path, `claude-mem` alias path
 

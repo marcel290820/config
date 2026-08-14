@@ -16,7 +16,7 @@ export CONTEXT7_API_KEY=...
 1. Installs Xcode Command Line Tools
 2. Installs/updates Homebrew
 3. Installs packages from `Brewfile` (ghostty, tmux, git, fzf, lazygit, htop, neovim)
-4. Symlinks dotfiles to `~/` (edits round-trip back to repo)
+4. Symlinks dotfiles to `~/` and `~/.claude/` (edits round-trip back to repo)
 5. Renders `opencode.json.tmpl` with API keys from env vars
 6. Copies `settings.json` and `statusline.sh` to `~/.claude/`
 7. Installs Tmux Plugin Manager (TPM)
@@ -30,6 +30,9 @@ Idempotent — safe to re-run anytime.
 | `.gitconfig` | symlink | `~/.gitconfig` |
 | `.tmux.conf` | symlink | `~/.tmux.conf` |
 | `.zshrc` | symlink | `~/.zshrc` |
+| `CLAUDE.md` | symlink | `~/.claude/CLAUDE.md` |
+| `ARCHITECTURE.md` | symlink | `~/.claude/ARCHITECTURE.md` |
+| `skills/ci-setup/` | symlink | `~/.claude/skills/ci-setup` |
 | `opencode.json.tmpl` | template | `~/.config/opencode/opencode.json` |
 | `settings.json` | copy | `~/.claude/settings.json` |
 | `statusline.sh` | copy | `~/.claude/statusline.sh` |
@@ -57,7 +60,7 @@ If these are not set, the opencode config is skipped with a warning.
 |-----|--------|
 | `C-b f` | fzf + nvim file finder |
 | `C-b g` | lazygit |
-| `C-b y` | opencode popup |
+| `C-b y` | claude popup |
 | `C-b N` | Obsidian quick note |
 | `C-b C` | zsh popup |
 | `C-b H` | htop |
