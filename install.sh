@@ -160,6 +160,7 @@ main() {
   symlink_dotfile "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
   symlink_dotfile "$DOTFILES_DIR/.tmux.conf"  "$HOME/.tmux.conf"
   symlink_dotfile "$DOTFILES_DIR/.zshrc"       "$HOME/.zshrc"
+  symlink_dotfile "$DOTFILES_DIR/ghostty"      "$HOME/Library/Application Support/com.mitchellh.ghostty"
 
   # Claude Code global instructions and skills
   symlink_dotfile "$DOTFILES_DIR/CLAUDE.md"       "$HOME/.claude/CLAUDE.md"

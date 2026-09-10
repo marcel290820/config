@@ -1,0 +1,68 @@
+font-family = "JetBrainsMono Nerd Font"
+font-family-bold = "JetBrainsMono Nerd Font Bold"
+font-family-italic = "JetBrainsMono Nerd Font Italic"
+font-family-bold-italic = "JetBrainsMono Nerd Font Bold Italic"
+
+# For terminfo capability on remote logins
+shell-integration-features = no-cursor,ssh-terminfo,ssh-env
+
+# Polar Instrument
+font-size = 14
+adjust-cell-height = 8%
+font-thicken = true
+font-thicken-strength = 64
+
+background = #081420
+foreground = #E3EEF7
+background-opacity = 0.80
+background-opacity-cells = true
+background-blur = macos-glass-regular
+minimum-contrast = 3
+
+palette = 0=#0D1C2B
+palette = 1=#EA8FA2
+palette = 2=#91DAC4
+palette = 3=#DDC184
+palette = 4=#86BFF2
+palette = 5=#B8ACE9
+palette = 6=#8BD9F1
+palette = 7=#C7D7E3
+palette = 8=#647D90
+palette = 9=#F0A4B3
+palette = 10=#A4E3D1
+palette = 11=#E8D099
+palette = 12=#9CCDF7
+palette = 13=#C8BDF2
+palette = 14=#A7E5F6
+palette = 15=#F3F8FC
+
+cursor-style = block
+cursor-style-blink = false
+cursor-color = #E7F8FF
+cursor-text = #081420
+selection-background = #24445A
+selection-foreground = #F3F8FC
+split-divider-color = #24445A
+unfocused-split-opacity = 0.72
+unfocused-split-fill = #06111B
+
+window-padding-x = 18
+window-padding-y = 14
+window-padding-balance = true
+macos-titlebar-style = tabs
+window-colorspace = display-p3
+
+custom-shader = shaders/polar-field.glsl
+custom-shader-animation = true
+
+# Vim-style split navigation
+keybind = super+alt+h=goto_split:left
+keybind = super+alt+j=goto_split:down
+keybind = super+alt+k=goto_split:up
+keybind = super+alt+l=goto_split:right
+
+# Vim-style split resizing
+keybind = super+ctrl+h=resize_split:left,10
+keybind = super+ctrl+j=resize_split:down,10
+keybind = super+ctrl+k=resize_split:up,10
+keybind = super+ctrl+l=resize_split:right,10
