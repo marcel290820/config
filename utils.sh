@@ -24,16 +24,11 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Function to get the home directory path
-get_home_dir() {
-    echo "$HOME"
-}
-
 # Function to create backup of existing file
 backup_file() {
     local file_path="$1"
     local backup_path="${file_path}.backup.$(date +%Y%m%d_%H%M%S)"
-    
+
     if mv "$file_path" "$backup_path"; then
         log_warning "Existing file backed up to: $backup_path"
         return 0
@@ -46,9 +41,4 @@ backup_file() {
 # Function to check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
-}
-
-# Function to check if running on macOS
-is_macos() {
-  [[ "$(uname -s)" == "Darwin" ]]
 }

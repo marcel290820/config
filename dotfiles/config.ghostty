@@ -52,9 +52,6 @@ window-padding-balance = true
 macos-titlebar-style = tabs
 window-colorspace = display-p3
 
-custom-shader = shaders/polar-field.glsl
-custom-shader-animation = true
-
 # Vim-style split navigation
 keybind = super+alt+h=goto_split:left
 keybind = super+alt+j=goto_split:down

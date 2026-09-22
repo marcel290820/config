@@ -15,7 +15,7 @@ install_xcode_tools() {
     return 0
   fi
   log_info "Installing Xcode Command Line Tools..."
-  log_warning "A dialog will appear — complete the installation, then re-run this script"
+  log_warning "A dialog will appear - complete the installation, then re-run this script"
   xcode-select --install && return 0 || return 1
 }
 
@@ -57,61 +57,16 @@ symlink_dotfile() {
       log_success "$(basename "$target") already symlinked correctly"
       return 0
     fi
-    log_warning "$(basename "$target") symlink points elsewhere — backing up and relinking"
+    log_warning "$(basename "$target") symlink points elsewhere - backing up and relinking"
     backup_file "$target"
   elif [[ -e "$target" ]]; then
-    log_warning "Existing $(basename "$target") found — backing up"
+    log_warning "Existing $(basename "$target") found - backing up"
     backup_file "$target"
   fi
 
   mkdir -p "$(dirname "$target")"
   ln -sfn "$source" "$target"
-  log_success "$(basename "$target") symlinked → $target"
-}
-
-# --- Template helper ---
-
-install_template() {
-  local template="$1"
-  local target="$2"
-  shift 2
-  local required_vars=("$@")
-
-  for var in "${required_vars[@]}"; do
-    if [[ -z "${!var:-}" ]]; then
-      log_error "Required env var $var is not set — skipping $(basename "$target")"
-      return 1
-    fi
-  done
-
-  if [[ -f "$target" && ! -L "$target" ]]; then
-    backup_file "$target"
-  fi
-
-  mkdir -p "$(dirname "$target")"
-  envsubst < "$template" > "$target"
-  log_success "$(basename "$template") rendered → $target"
-}
-
-# --- Copy helper ---
-
-copy_dotfile() {
-  local source="$1"
-  local target="$2"
-  local permissions="${3:-}"
-
-  if [[ -f "$target" && ! -L "$target" ]]; then
-    backup_file "$target"
-  fi
-
-  mkdir -p "$(dirname "$target")"
-  cp "$source" "$target"
-
-  if [[ -n "$permissions" ]]; then
-    chmod "$permissions" "$target"
-  fi
-
-  log_success "$(basename "$source") copied → $target"
+  log_success "$(basename "$target") symlinked -> $target"
 }
 
 # --- TPM ---
@@ -129,12 +84,15 @@ install_tpm() {
 
   mkdir -p "$HOME/.tmux/plugins"
   git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
-  log_success "TPM installed — press prefix+I in tmux to install plugins"
+  log_success "TPM installed - press prefix+I in tmux to install plugins"
 }
 
 # --- Main ---
 
 main() {
+  local ghostty_dir="$HOME/Library/Application Support/com.mitchellh.ghostty"
+  local legacy_target
+
   if [[ "$(uname -s)" != "Darwin" ]]; then
     log_error "This script is for macOS only"
     exit 1
@@ -151,35 +109,33 @@ main() {
   if command_exists brew; then
     install_brew_packages
   else
-    log_error "Homebrew not available — skipping package installation"
+    log_error "Homebrew not available - skipping package installation"
     exit 1
   fi
 
   # Step 3: Symlink dotfiles
   log_info "Symlinking dotfiles..."
+  for legacy_target in \
+    "$HOME/.claude/CLAUDE.md" \
+    "$HOME/.claude/ARCHITECTURE.md" \
+    "$HOME/.claude/skills/ci-setup"; do
+    if [[ -L "$legacy_target" && ! -e "$legacy_target" ]]; then
+      log_warning "Broken legacy symlink found at $legacy_target - backing up"
+      backup_file "$legacy_target"
+    fi
+  done
+
   symlink_dotfile "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
   symlink_dotfile "$DOTFILES_DIR/.tmux.conf"  "$HOME/.tmux.conf"
+  symlink_dotfile "$DOTFILES_DIR/.vimrc"       "$HOME/.vimrc"
   symlink_dotfile "$DOTFILES_DIR/.zshrc"       "$HOME/.zshrc"
-  symlink_dotfile "$DOTFILES_DIR/ghostty"      "$HOME/Library/Application Support/com.mitchellh.ghostty"
+  if [[ -L "$ghostty_dir" ]]; then
+    log_warning "Legacy Ghostty directory symlink found - backing up"
+    backup_file "$ghostty_dir"
+  fi
+  symlink_dotfile "$DOTFILES_DIR/config.ghostty" "$ghostty_dir/config"
 
-  # Claude Code global instructions and skills
-  symlink_dotfile "$DOTFILES_DIR/CLAUDE.md"       "$HOME/.claude/CLAUDE.md"
-  symlink_dotfile "$DOTFILES_DIR/ARCHITECTURE.md" "$HOME/.claude/ARCHITECTURE.md"
-  symlink_dotfile "$DOTFILES_DIR/skills/ci-setup" "$HOME/.claude/skills/ci-setup"
-
-  # Step 4: Template configs (require env vars)
-  log_info "Rendering config templates..."
-  install_template \
-    "$DOTFILES_DIR/opencode.json.tmpl" \
-    "$HOME/.config/opencode/opencode.json" \
-    NVIDIA_API_KEY CONTEXT7_API_KEY || true
-
-  # Step 5: Copy non-symlinkable configs
-  log_info "Copying config files..."
-  copy_dotfile "$DOTFILES_DIR/settings.json" "$HOME/.claude/settings.json"
-  copy_dotfile "$DOTFILES_DIR/statusline.sh" "$HOME/.claude/statusline.sh" "+x"
-
-  # Step 6: TPM
+  # Step 4: TPM
   if command_exists git; then
     install_tpm
   fi

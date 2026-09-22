@@ -1,67 +1,70 @@
 # AGENTS.md
 
 ## Repo purpose
-macOS dotfiles + one-command setup. `dotfiles/` is the canonical config source. `install.sh` is the only script.
+
+This repository contains macOS dotfiles and a one-command setup. `dotfiles/` is the canonical config source. `install.sh` runs the setup, and `utils.sh` provides its shared shell helpers.
 
 ## Source of truth
-- **`dotfiles/`** holds all canonical dotfiles (`.gitconfig`, `.tmux.conf`, `.zshrc`, `settings.json`, `statusline.sh`)
-- **`dotfiles/CLAUDE.md`** and **`dotfiles/ARCHITECTURE.md`** are the global Claude Code instructions. `CLAUDE.md` imports `ARCHITECTURE.md` and `RTK.md` by relative path, so both must sit beside it in `~/.claude/`. `RTK.md` is not in this repo yet.
-- **`dotfiles/skills/`** holds Claude Code skills, one directory per skill
-- **`dotfiles/opencode.json.tmpl`** is a template — API keys are env vars (`$NVIDIA_API_KEY`, `$CONTEXT7_API_KEY`), rendered at install time via `envsubst`
-- No inline config anywhere. All dotfiles are real files in `dotfiles/`.
+
+- `dotfiles/` holds `.gitconfig`, `.tmux.conf`, `.vimrc`, `.zshrc`, and `config.ghostty`.
+- `Brewfile` declares every Homebrew package and cask.
+- `install.sh` defines the setup flow and symlink targets.
+- `utils.sh` contains logging, backup, and command lookup helpers used by `install.sh`.
+- Keep config in real files under `dotfiles/`. Do not add inline config to the installer.
 
 ## Running the setup
+
 ```bash
 ./install.sh
 ```
-Single script: Xcode CLI tools → Homebrew → Brewfile packages → symlink dotfiles → render templates → copy configs → TPM.
 
-Idempotent — safe to re-run.
-
-## Required env vars (for opencode.json template)
-- `NVIDIA_API_KEY`
-- `CONTEXT7_API_KEY`
-
-Set these before running `install.sh` or the opencode config will be skipped with a warning.
+The script installs Xcode Command Line Tools, Homebrew packages, dotfile symlinks, and TPM. It is safe to run again. Existing targets are moved to timestamped backup files before replacement.
 
 ## Symlink architecture
-`install.sh` symlinks dotfiles to `~/`:
-- `dotfiles/.gitconfig` → `~/.gitconfig`
-- `dotfiles/.tmux.conf` → `~/.tmux.conf`
-- `dotfiles/.zshrc` → `~/.zshrc`
-- `dotfiles/CLAUDE.md` → `~/.claude/CLAUDE.md`
-- `dotfiles/ARCHITECTURE.md` → `~/.claude/ARCHITECTURE.md`
-- `dotfiles/skills/ci-setup` → `~/.claude/skills/ci-setup`
 
-Edits in `~/` round-trip back to the repo. Existing files are backed up before linking. `symlink_dotfile` handles files and directories, and creates the target's parent directory.
+`install.sh` creates these links:
 
-Non-symlinkable configs (JSON, scripts) are copied:
-- `dotfiles/settings.json` → `~/.claude/settings.json`
-- `dotfiles/statusline.sh` → `~/.claude/statusline.sh`
-- `dotfiles/opencode.json.tmpl` → `~/.config/opencode/opencode.json` (rendered)
+- `dotfiles/.gitconfig` -> `~/.gitconfig`
+- `dotfiles/.tmux.conf` -> `~/.tmux.conf`
+- `dotfiles/.vimrc` -> `~/.vimrc`
+- `dotfiles/.zshrc` -> `~/.zshrc`
+- `dotfiles/config.ghostty` -> `~/Library/Application Support/com.mitchellh.ghostty/config`
+
+Edits made through a target path update the tracked source. `symlink_dotfile` supports files and directories and creates the target's parent directory.
 
 ## Brewfile
-`Brewfile` at repo root declares all Homebrew packages. Edit there, not in a script.
 
-## Tmux popup keybindings (from dotfiles/.tmux.conf)
+Edit the root `Brewfile` when adding or removing a package. Do not install packages from `install.sh` directly.
+
+## Tmux popup keybindings
+
 | Key | Action |
-|-----|--------|
-| `C-b f` | fzf + nvim file finder |
+| --- | --- |
+| `C-b f` | fzf file picker in Vim |
 | `C-b g` | lazygit |
-| `C-b y` | claude popup session |
-| `C-b N` | Obsidian quick note |
+| `C-b N` | Obsidian quick note in Vim |
 | `C-b C` | zsh popup |
 | `C-b H` | htop |
 
-## Adding new dotfiles
-1. Place file in `dotfiles/`
-2. Add a `symlink_dotfile` or `copy_dotfile` call in `install.sh`
-3. If it's a Brew package, add to `Brewfile`
+## Adding a dotfile
+
+1. Place the file in `dotfiles/`.
+2. Add a `symlink_dotfile` call in `install.sh`.
+3. Add a required package to `Brewfile`.
 
 ## Hardcoded paths
-- `dotfiles/.tmux.conf:38` — Obsidian note path hardcoded to `/Users/mheidebrecht/Library/Mobile Documents/iCloud~md~obsidian/...`
-- `dotfiles/settings.json:8` — statusline script path `~/.claude/statusline.sh`
-- `dotfiles/.zshrc` — `wtree` alias path, `claude-mem` alias path
 
-## No build/test/lint
-Pure shell repo. No package manager, no CI, no test suite. Validate by running `./install.sh`.
+- `dotfiles/.tmux.conf` contains the personal Obsidian quick-note path.
+- `dotfiles/.zshrc` contains local paths for personal scripts and tools.
+
+## Verification
+
+This repository has no build, test suite, or CI pipeline. Run the available local checks:
+
+```bash
+bash -n install.sh utils.sh
+brew bundle check --file=Brewfile
+vim -Nu dotfiles/.vimrc -n -es '+qa!'
+```
+
+Run `./install.sh` only when an end-to-end setup run is intended because it installs packages and updates files in the home directory.

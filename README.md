@@ -1,76 +1,59 @@
-# macOS Config
+# macOS config
 
-One-command macOS setup — dotfiles, packages, and tool configuration.
+One-command macOS setup for packages and dotfiles.
 
-## Quick Start
+## Quick start
 
 ```bash
 git clone <repo-url> && cd config
-export NVIDIA_API_KEY=...
-export CONTEXT7_API_KEY=...
 ./install.sh
 ```
 
-## What it does
+The installer:
 
-1. Installs Xcode Command Line Tools
-2. Installs/updates Homebrew
-3. Installs packages from `Brewfile` (ghostty, tmux, git, fzf, lazygit, htop, neovim)
-4. Symlinks dotfiles to `~/` and `~/.claude/` (edits round-trip back to repo)
-5. Renders `opencode.json.tmpl` with API keys from env vars
-6. Copies `settings.json` and `statusline.sh` to `~/.claude/`
-7. Installs Tmux Plugin Manager (TPM)
+1. Installs Xcode Command Line Tools and Homebrew.
+2. Installs the packages in `Brewfile`.
+3. Symlinks the tracked dotfiles into the home directory.
+4. Installs or updates Tmux Plugin Manager (TPM).
 
-Idempotent — safe to re-run anytime.
+It is safe to run the installer again. Existing targets are moved to timestamped backup files before new links replace them.
 
 ## Dotfiles
 
-| File | Method | Target |
-|------|--------|--------|
-| `.gitconfig` | symlink | `~/.gitconfig` |
-| `.tmux.conf` | symlink | `~/.tmux.conf` |
-| `.zshrc` | symlink | `~/.zshrc` |
-| `CLAUDE.md` | symlink | `~/.claude/CLAUDE.md` |
-| `ARCHITECTURE.md` | symlink | `~/.claude/ARCHITECTURE.md` |
-| `skills/ci-setup/` | symlink | `~/.claude/skills/ci-setup` |
-| `opencode.json.tmpl` | template | `~/.config/opencode/opencode.json` |
-| `settings.json` | copy | `~/.claude/settings.json` |
-| `statusline.sh` | copy | `~/.claude/statusline.sh` |
+| Source | Target |
+| --- | --- |
+| `dotfiles/.gitconfig` | `~/.gitconfig` |
+| `dotfiles/.tmux.conf` | `~/.tmux.conf` |
+| `dotfiles/.vimrc` | `~/.vimrc` |
+| `dotfiles/.zshrc` | `~/.zshrc` |
+| `dotfiles/config.ghostty` | `~/Library/Application Support/com.mitchellh.ghostty/config` |
 
-Existing files are backed up with timestamps before being replaced.
+The Brew bundle installs Git, GitHub CLI, Ghostty, Vim, tmux, fzf, direnv, lazygit, htop, and the terminal font used by Ghostty.
 
-## Required Environment Variables
-
-| Variable | Used by |
-|----------|---------|
-| `NVIDIA_API_KEY` | opencode.json (NVIDIA provider) |
-| `CONTEXT7_API_KEY` | opencode.json (Context7 MCP) |
-
-If these are not set, the opencode config is skipped with a warning.
-
-## Adding New Config
-
-1. Add the dotfile to `dotfiles/`
-2. Add a `symlink_dotfile` or `copy_dotfile` call in `install.sh`
-3. If it needs a Brew package, add it to `Brewfile`
-
-## Tmux Keybindings
+## Tmux keybindings
 
 | Key | Action |
-|-----|--------|
-| `C-b f` | fzf + nvim file finder |
-| `C-b g` | lazygit |
-| `C-b y` | claude popup |
-| `C-b N` | Obsidian quick note |
-| `C-b C` | zsh popup |
-| `C-b H` | htop |
+| --- | --- |
+| `C-b f` | Open an fzf file picker in Vim |
+| `C-b g` | Open lazygit |
+| `C-b N` | Open the Obsidian quick note in Vim |
+| `C-b C` | Open a zsh popup |
+| `C-b H` | Open htop |
+
+Install tmux plugins with `C-b I` after the first setup run.
+
+## Adding a dotfile
+
+1. Add the file to `dotfiles/`.
+2. Add its `symlink_dotfile` call to `install.sh`.
+3. Add any required Homebrew package to `Brewfile`.
 
 ## Requirements
 
-- macOS (Apple Silicon or Intel)
-- Internet connection
-- Admin privileges (for Xcode CLI Tools)
+- macOS on Apple Silicon or Intel
+- An internet connection
+- Administrator access for Xcode Command Line Tools
 
 ## License
 
-Personal use only — fork and adapt freely.
+Personal use only. Fork and adapt as needed.
