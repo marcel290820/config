@@ -1,11 +1,12 @@
 # Config
 
-Personal configuration files for AI agents, Git, Ghostty, herdr, tmux, Vim, and
-Zsh. This repo contains no software installer or package list.
+Personal configuration files for AI agents, Claude Code, Git, Ghostty, herdr, tmux,
+Vim, and Zsh. This repo contains no software installer or package list.
 
 | Config | Location on macOS |
 | --- | --- |
 | `agents/AGENTS.md` | `~/.agents/AGENTS.md` |
+| `claude/statusline.sh` | `~/.claude/statusline.sh` |
 | `git/config` | `~/.gitconfig` |
 | `ghostty/config` | `~/Library/Application Support/com.mitchellh.ghostty/config` |
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |

@@ -4,6 +4,13 @@ cd "$(dirname "$0")/.."
 
 git config --file git/config --list >/dev/null
 zsh -n zsh/zshrc
+bash -n claude/statusline.sh
+# statusline: decimal limits under a comma locale, backslashes in paths, malformed input
+sl_out=$(printf '%s' '{"workspace":{"current_dir":"/tmp/work\\config"},"rate_limits":{"five_hour":{"used_percentage":42.4}}}' | LC_ALL=de_DE.UTF-8 bash claude/statusline.sh)
+case "$sl_out" in *'work\config'*'5h: 42%'*) ;; *) echo "statusline: path or locale output broken" >&2; exit 1 ;; esac
+for bad in 'not json' '' '   '; do
+  if printf '%s' "$bad" | bash claude/statusline.sh >/dev/null 2>&1; then echo "statusline: bad input '$bad' not rejected" >&2; exit 1; fi
+done
 
 check_tmp=$(mktemp -d)
 tmux_socket="config-check-$$"
