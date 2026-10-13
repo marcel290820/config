@@ -35,7 +35,7 @@ height = "80%"
 [[keys.command]]
 key = "prefix+alt+a"
 type = "popup"
-command = 'PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH"; cd "${HERDR_ACTIVE_PANE_CWD:-$PWD}" && exec codex'
+command = 'PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH"; cd "${HERDR_ACTIVE_PANE_CWD:-$PWD}" && exec codex -m gpt-6.1-sol -c model_reasoning_effort=low'
 description = "codex"
 width = "80%"
 height = "80%"
