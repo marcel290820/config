@@ -3,7 +3,6 @@
 	name = Marcel Heidebrecht
 [core]
 	editor = vim
-	hooksPath = ~/.claude/git-hooks
 [pull]
 	rebase = false
 [alias]

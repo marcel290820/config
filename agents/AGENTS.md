@@ -22,7 +22,6 @@ Shared by Claude Code and Codex on the Mac and the VPS. Project instructions and
 - Fail loud: no swallowed errors, no silenced tooling (`any`, `ts-ignore`, `noqa`, disabled lint rules). Validate data at trust boundaries.
 - Check existing code and dependencies before adding anything. Add a dependency only when the requirement justifies it, pin it, and update the lockfile.
 - Never claim done without running the check that proves it. A bugfix needs a check that fails before and passes after.
-- Every project has one check script (`.claude/check.sh`, or `.codex/check.sh`) running lint, typecheck, and tests; the Stop and commit hooks run it, and CI runs the same script.
 - Ask only when ambiguity would materially change the result or verification would be expensive, risky, or irreversible.
 - Never expose or commit secrets, tokens, credentials, or personal data.
 - For library, framework, SDK, API, CLI, or cloud-service docs, use the Context7 MCP (`resolve-library-id`, then `query-docs`) before relying on memory.
