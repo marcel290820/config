@@ -1,0 +1,18 @@
+[user]
+	email = 23739572+marcel290820@users.noreply.github.com
+	name = Marcel Heidebrecht
+[core]
+	editor = vim
+	hooksPath = ~/.claude/git-hooks
+[pull]
+	rebase = false
+[alias]
+	lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[init]
+	defaultBranch = main

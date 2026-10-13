@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# herdr-new – Projekt-Workspace oder Task-Tab mit deinem Standard-Layout:
+#             links Agent, rechts Shell im selben Verzeichnis.
+#
+#   herdr-new                  fzf: Projekt wählen oder neuen Namen tippen, dann Agent wählen
+#   herdr-new <dir> [agent]    direkt, ohne Auswahl (z. B. herdr-new ~/Projects/foo codex)
+#   herdr-new --tab [agent]    neuer Tab im aktuellen Workspace, fragt nach Task-Namen
+#
+# Braucht: herdr, jq, fzf, git
+set -euo pipefail
+
+# Suchwurzeln unter $HOME (nur existierende werden durchsucht).
+# Überschreibbar per HERDR_ROOTS, doppelpunkt-getrennt, z. B. HERDR_ROOTS="Projects:Work:Uni"
+ROOTS_DEFAULT="Projects:Work:Worktree:Worktrees:Documents:Code:Developer:dev:repos:src"
+NEW_ROOT="${HERDR_NEW_ROOT:-$HOME/Projects}"  # hier landen neue Projekte ohne Wurzel-Präfix
+DEPTH="${HERDR_MAX_DEPTH:-}"                  # leer = beliebige Tiefe, z. B. 3 = max. 3 Ebenen
+HERDR="${HERDR_BIN_PATH:-herdr}"
+
+# Existierende Wurzeln sammeln; Duplikate (z. B. Symlinks oder Groß/Klein auf macOS) nur einmal
+roots=()
+IFS=: read -ra _cand <<<"${HERDR_ROOTS:-$ROOTS_DEFAULT}"
+for r in "${_cand[@]}"; do
+  [[ -d "$HOME/$r" ]] || continue
+  for seen in "${roots[@]+"${roots[@]}"}"; do [[ "$HOME/$r" -ef "$HOME/$seen" ]] && continue 2; done
+  roots+=("$r")
+done
+
+# Nur echte Projekte: Ordner mit einem .git (Verzeichnis, oder Datei bei Worktrees),
+# in beliebiger Tiefe, relativ zu $HOME (z. B. "Work/kunde/tool").
+# fd überspringt gitignorte Ordner (node_modules, .venv, build, …) beim Suchen von selbst.
+list_projects() {
+  (( ${#roots[@]} )) || return 0
+  if command -v fd >/dev/null; then
+    # fd listet die Wurzel selbst nicht, also Wurzeln, die selbst ein Repo sind, extra
+    for r in "${roots[@]}"; do [[ -e "$HOME/$r/.git" ]] && printf '%s\n' "$r"; done
+    # fd blendet .git selbst immer aus, daher: alle (nicht ignorierten) Ordner listen
+    # und die behalten, die ein .git enthalten
+    (cd "$HOME" && fd --type d ${DEPTH:+--max-depth "$DEPTH"} . "${roots[@]}" | sed 's:/$::' \
+       | while IFS= read -r p; do [[ -e "$p/.git" ]] && printf '%s\n' "$p"; done) || true
+  else
+    # Fallback ohne fd: kennt .gitignore nicht, überspringt versteckte Ordner und node_modules
+    local d=""; [[ -n "$DEPTH" ]] && d=$((DEPTH + 1))   # .git liegt eine Ebene tiefer
+    (cd "$HOME" && find "${roots[@]}" ${d:+-maxdepth "$d"} \
+       \( -name node_modules -o \( -name '.*' ! -name .git \) \) -prune \
+       -o -name .git -print -prune | sed 's:/\.git$::')
+  fi
+}
+
+# Häufig benutzte Projekte zuerst (falls zoxide installiert ist), Rest alphabetisch
+order() {
+  local all; all=$(sort -u)
+  if command -v zoxide >/dev/null && [[ -n "$all" ]]; then
+    { zoxide query -l 2>/dev/null | sed "s|^$HOME/||" | grep -Fx -f <(printf '%s\n' "$all") || true
+      printf '%s\n' "$all"; } | awk '!seen[$0]++'
+  else
+    printf '%s\n' "$all"
+  fi
+}
+
+pick_agent() {
+  if [[ -n "${1:-}" ]]; then echo "$1"; return; fi
+  printf 'claude\ncodex\n' | fzf --height=~6 --prompt='Agent> ' || return 1
+}
+
+pane_id() {  # $1 = herdr-JSON-Antwort; bricht ab, wenn keine Pane-ID drinsteht
+  jq -er '.result.root_pane.pane_id | strings | select(length > 0)' <<<"$1" \
+    || { echo "herdr-new: keine Pane-ID in der herdr-Antwort: $1" >&2; return 1; }
+}
+
+layout() {  # $1 = root pane id, $2 = dir, $3 = agent
+  "$HERDR" pane split "$1" --direction right --cwd "$2" --no-focus >/dev/null
+  "$HERDR" pane run "$1" "$3"
+}
+
+# --- Modus: neuer Task-Tab im aktuellen Projekt ---
+if [[ "${1:-}" == "--tab" ]]; then
+  dir="${HERDR_ACTIVE_PANE_CWD:-$PWD}"
+  read -rp "Task-Name: " label
+  agent=$(pick_agent "${2:-}") || exit 0
+  res=$("$HERDR" tab create --cwd "$dir" --label "${label:-task}" --focus)
+  pid=$(pane_id "$res")
+  layout "$pid" "$dir" "$agent"
+  exit 0
+fi
+
+# --- Modus: neues/bestehendes Projekt als Workspace ---
+if [[ -n "${1:-}" ]]; then
+  dir="$1"
+else
+  # --exact: Wörter müssen als Teilstring vorkommen (kein Buchstaben-Verstreuen);
+  #          mehrere Wörter = UND, 'wort = doch fuzzy, ^wort / wort$ = Anfang/Ende
+  # --scheme=path: Treffer im Ordnernamen zählen mehr als Treffer weiter vorne im Pfad
+  sel=$(list_projects | order \
+        | fzf --print-query --exact --scheme=path --tiebreak=index \
+              --prompt='Projekt (neuer Pfad = anlegen)> ' \
+              --preview "git -C '$HOME'/{} log --oneline --color=always -15 2>/dev/null" \
+              --preview-window=right,45% || true)
+  dir=$(tail -n1 <<<"$sel")
+  [[ -z "$dir" ]] && exit 0
+  # "Work/foo" → ~/Work/foo; ohne bekannte Wurzel ("foo") → $NEW_ROOT/foo
+  if [[ "$dir" != /* ]]; then
+    base="$NEW_ROOT"
+    for r in "${roots[@]+"${roots[@]}"}"; do [[ "$dir" == "$r" || "$dir" == "$r"/* ]] && base="$HOME"; done
+    dir="$base/$dir"
+  fi
+fi
+
+agent=$(pick_agent "${2:-}") || exit 0
+if [[ ! -d "$dir" ]]; then
+  mkdir -p "$dir"
+  git -C "$dir" init -q
+fi
+dir=$(cd "$dir" && pwd)
+
+res=$("$HERDR" workspace create --cwd "$dir" --label "$(basename "$dir")" --focus)
+pid=$(pane_id "$res")
+layout "$pid" "$dir" "$agent"

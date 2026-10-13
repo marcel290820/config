@@ -1,0 +1,99 @@
+# This is the configuration file for Ghostty.
+#
+# This template file has been automatically created at the following
+# path since Ghostty couldn't find any existing config files on your system:
+#
+#   ~/Library/Application Support/com.mitchellh.ghostty/config
+#
+# The template does not set any default options, since Ghostty ships
+# with sensible defaults for all options. Users should only need to set
+# options that they want to change from the default.
+#
+# Run `ghostty +show-config --default --docs` to view a list of
+# all available config options and their default values.
+#
+# Additionally, each config option is also explained in detail
+# on Ghostty's website, at https://ghostty.org/docs/config.
+
+# Config syntax crash course
+# ==========================
+# # The config file consists of simple key-value pairs,
+# # separated by equals signs.
+# font-family = Iosevka
+# window-padding-x = 2
+#
+# # Spacing around the equals sign does not matter.
+# # All of these are identical:
+# key=value
+# key= value
+# key =value
+# key = value
+#
+# # Any line beginning with a # is a comment. It's not possible to put
+# # a comment after a config option, since it would be interpreted as a
+# # part of the value. For example, this will have a value of "#123abc":
+# background = #123abc
+#
+# # Empty values are used to reset config keys to default.
+# key =
+#
+# # Some config options have unique syntaxes for their value,
+# # which is explained in the docs for that config option.
+# # Just for example:
+# resize-overlay-duration = 4s 200ms
+font-family = "JetBrainsMono Nerd Font"
+font-family-bold = "JetBrainsMono Nerd Font Bold"
+font-family-italic = "JetBrainsMono Nerd Font Italic"
+font-family-bold-italic = "JetBrainsMono Nerd Font Bold Italic"
+
+# For terminfo capability on remote logins
+shell-integration-features = no-cursor,ssh-terminfo,ssh-env
+
+# Polar Instrument
+font-size = 14
+adjust-cell-height = 8%
+font-thicken = true
+font-thicken-strength = 64
+
+background = #081420
+foreground = #E3EEF7
+background-opacity = 0.90
+background-opacity-cells = true
+background-blur = macos-glass-regular
+minimum-contrast = 3
+
+palette = 0=#0D1C2B
+palette = 1=#EA8FA2
+palette = 2=#91DAC4
+palette = 3=#DDC184
+palette = 4=#86BFF2
+palette = 5=#B8ACE9
+palette = 6=#8BD9F1
+palette = 7=#C7D7E3
+palette = 8=#647D90
+palette = 9=#F0A4B3
+palette = 10=#A4E3D1
+palette = 11=#E8D099
+palette = 12=#9CCDF7
+palette = 13=#C8BDF2
+palette = 14=#A7E5F6
+palette = 15=#F3F8FC
+
+cursor-style = block
+cursor-style-blink = false
+cursor-color = #E7F8FF
+cursor-text = #081420
+selection-background = #24445A
+selection-foreground = #F3F8FC
+split-divider-color = #24445A
+unfocused-split-opacity = 0.72
+unfocused-split-fill = #06111B
+
+window-padding-x = 18
+window-padding-y = 14
+window-padding-balance = true
+macos-titlebar-style = native
+window-colorspace = display-p3
+
+# Pi, see: https://pi.dev/docs/latest/terminal-setup#ghostty
+keybind = alt+backspace=text:\x1b\x7f

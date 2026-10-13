@@ -1,0 +1,48 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[ui.sound]
+enabled = true
+
+[theme]
+name = "terminal"
+auto_switch = false
+
+# lazygit als 80%-Popup im Verzeichnis des aktiven Panes
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = 'PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH"; cd "${HERDR_ACTIVE_PANE_CWD:-$PWD}" && lazygit; s=$?; [ "$s" -eq 0 ] || { printf "\nlazygit beendet mit Code %s – Enter zum Schließen\n" "$s"; read _; }'
+description = "lazygit"
+width = "80%"
+height = "80%"
+
+# Scratch-Terminal als Popup, z. B. für ein kurzes git log oder npm i
+[[keys.command]]
+key = "prefix+t"
+type = "popup"
+command = "exec \"${SHELL:-sh}\""
+description = "scratch terminal"
+width = "80%"
+height = "80%"
+
+# Neues Projekt + Agent (siehe Schritt 2)
+[[keys.command]]
+key = "prefix+alt+o"
+type = "popup"
+command = "~/.local/bin/herdr-new"
+description = "neues Projekt + Agent"
+width = "60%"
+height = "50%"
+
+# Neuer Task-Tab im aktuellen Projekt + Agent
+[[keys.command]]
+key = "prefix+alt+n"
+type = "popup"
+command = "~/.local/bin/herdr-new --tab"
+description = "neuer Task + Agent"
+width = "60%"
+height = "50%"
+
