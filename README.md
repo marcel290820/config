@@ -1,7 +1,7 @@
 # Config
 
-Personal configuration files for AI agents, Claude Code, Git, Ghostty, herdr, tmux,
-Vim, and Zsh. This repo contains no software installer or package list.
+Personal configuration files for AI agents, Claude Code, Git, Ghostty, herdr,
+Neovim, tmux, Vim, and Zsh. This repo contains no software installer or package list.
 
 | Config | Location on macOS |
 | --- | --- |
@@ -11,6 +11,7 @@ Vim, and Zsh. This repo contains no software installer or package list.
 | `ghostty/config` | `~/Library/Application Support/com.mitchellh.ghostty/config` |
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |
 | `herdr/herdr-new` | `~/.local/bin/herdr-new` |
+| `nvim/` | `~/.config/nvim/` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
 | `vim/vimrc` | `~/.vimrc` |
 | `zsh/zshrc` | `~/.zshrc` |

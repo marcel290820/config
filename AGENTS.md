@@ -22,7 +22,7 @@ truth; `README.md` maps them to their macOS locations.
 ## Verification
 
 Run `.codex/check.sh` after config changes. It validates the Claude Code, Git, Zsh, Vim,
-tmux, Ghostty, and herdr files with their installed CLIs. This script does not install
+Neovim, tmux, Ghostty, and herdr files with their installed CLIs. This script does not install
 software or change live home-directory configs.
 
 Do not modify live home-directory configs as part of repository edits.

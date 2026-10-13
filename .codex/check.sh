@@ -25,6 +25,14 @@ if command -v rg >/dev/null; then
     '+qa!' || { echo "vimrc: RgFind path resolution broken" >&2; exit 1; }
 fi
 
+# Neovim: Lua syntax only; a full LazyVim start needs network and plugin installs
+for f in $(find nvim -name '*.lua'); do
+  nvim --clean --headless -l /dev/stdin "$f" <<'LUA' || { echo "nvim: syntax error in $f" >&2; exit 1; }
+assert(loadfile(arg[1]))
+LUA
+done
+python3 -c 'import json,sys; [json.load(open(f)) for f in sys.argv[1:]]' nvim/lazyvim.json nvim/lazy-lock.json
+
 tmux_config="$check_tmp/tmux.conf"
 sed '/^[[:space:]]*set -g @plugin /d; /^[[:space:]]*run /d' tmux/tmux.conf > "$tmux_config"
 tmux -L "$tmux_socket" -f "$tmux_config" new-session -d -s check /usr/bin/true
