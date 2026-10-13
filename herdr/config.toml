@@ -33,7 +33,7 @@ height = "80%"
 
 # Codex-Session als Popup im Verzeichnis des aktiven Panes
 [[keys.command]]
-key = "prefix+alt+c"
+key = "prefix+alt+a"
 type = "popup"
 command = 'PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH"; cd "${HERDR_ACTIVE_PANE_CWD:-$PWD}" && exec codex'
 description = "codex"
